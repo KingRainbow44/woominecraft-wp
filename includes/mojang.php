@@ -39,18 +39,6 @@ function validate_is_paid_player() {
 
 		return;
 	}
-
-	// Grab JSON data
-	$mc_json = get_player_from_cache( $player_id );
-	if ( ! $mc_json ) {
-		wc_add_notice( __( 'We cannot retrieve your account from the Mojang API. Try again later, or contact an administrator.', 'woominecraft' ), 'error' );
-	}
-
-	if ( isset( $mc_json->demo ) ) {
-		wc_add_notice( __( 'We do not allow unpaid-accounts to make donations, sorry!', 'woominecraft' ), 'error' );
-
-		return;
-	}
 }
 
 
@@ -86,17 +74,6 @@ function get_player_from_cache( $player_id ) {
 		);
 
 		$minecraft_account = wp_remote_post( 'https://api.mojang.com/profiles/minecraft', $post_config );
-
-		if ( 200 !== wp_remote_retrieve_response_code( $minecraft_account ) ) {
-			return false;
-		}
-
-		$mc_json = json_decode( wp_remote_retrieve_body( $minecraft_account ) );
-		if ( ! isset( $mc_json[0] ) ) {
-			return false;
-		} else {
-			$mc_json = $mc_json[0];
-		}
 
 		wp_cache_set( $key, $mc_json, 'wcm', 1 * HOUR_IN_SECONDS );
 	}
